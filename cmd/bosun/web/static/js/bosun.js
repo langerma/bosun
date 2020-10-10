@@ -3195,8 +3195,8 @@ bosunControllers.controller('HostCtrl', ['$scope', '$http', '$location', '$route
         cpu_r.start = $scope.time;
         cpu_r.queries = [
             new Query(false, {
-                metric: 'os.cpu',
-                derivative: 'counter',
+                metric: 'cpu_usage_idle',
+                derivative: 'gauge',
                 tags: { host: $scope.host }
             })
         ];
@@ -3211,11 +3211,11 @@ bosunControllers.controller('HostCtrl', ['$scope', '$http', '$location', '$route
         var mem_r = new GraphRequest();
         mem_r.start = $scope.time;
         mem_r.queries.push(new Query(false, {
-            metric: "os.mem.total",
+            metric: "mem_available",
             tags: { host: $scope.host }
         }));
         mem_r.queries.push(new Query(false, {
-            metric: "os.mem.used",
+            metric: "mem_used",
             tags: { host: $scope.host }
         }));
         $http.get('/api/graph?' + 'json=' + encodeURIComponent(JSON.stringify(mem_r)) + autods)
@@ -3231,10 +3231,10 @@ bosunControllers.controller('HostCtrl', ['$scope', '$http', '$location', '$route
         net_bytes_r.start = $scope.time;
         net_bytes_r.queries = [
             new Query(false, {
-                metric: "os.net.bytes",
+                metric: "net_bytes_recv",
                 rate: true,
                 rateOptions: { counter: true, resetValue: 1 },
-                tags: { host: $scope.host, iface: "*", direction: "*" }
+                tags: { host: $scope.host, interface: "*" }
             })
         ];
         $http.get('/api/graph?' + 'json=' + encodeURIComponent(JSON.stringify(net_bytes_r)) + autods)
@@ -3263,12 +3263,12 @@ bosunControllers.controller('HostCtrl', ['$scope', '$http', '$location', '$route
         fs_r.start = $scope.time;
         fs_r.queries = [
             new Query(false, {
-                metric: "os.disk.fs.space_total",
-                tags: { host: $scope.host, disk: "*" }
+                metric: "disk_total",
+                tags: { host: $scope.host, path: "*" }
             }),
             new Query(false, {
-                metric: "os.disk.fs.space_used",
-                tags: { host: $scope.host, disk: "*" }
+                metric: "disk_used",
+                tags: { host: $scope.host, path: "*" }
             })
         ];
         $http.get('/api/graph?' + 'json=' + encodeURIComponent(JSON.stringify(fs_r)) + autods)
@@ -3281,7 +3281,7 @@ bosunControllers.controller('HostCtrl', ['$scope', '$http', '$location', '$route
             angular.forEach(data.Series, function (series, idx) {
                 var stat = series.Data[series.Data.length - 1][1];
                 var prop = "";
-                if (series.Metric == "os.disk.fs.space_total") {
+                if (series.Metric == "disk_total") {
                     prop = "total";
                 }
                 else {
